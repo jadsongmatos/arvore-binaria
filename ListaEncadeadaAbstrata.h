@@ -6,7 +6,7 @@
 
 #include "Elemento.h"
 // Elemento
-#include "ListaEncadeadaAbstrata.h"
+//#include "ListaEncadeadaAbstrata.h"
 #include "excecoes.h"
 // ExcecaoDadoInexistente
 // ExcecaoListaEncadeadaVazia

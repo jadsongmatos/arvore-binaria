@@ -13,15 +13,30 @@
 template<typename T>
 class MinhaArvoreDeBuscaBinaria : public ArvoreDeBuscaBinaria<T>
 {
-    MinhaArvoreDeBuscaBinaria();
-    ~MinhaArvoreDeBuscaBinaria();
+protected:
+    void andar(int *q,Nodo<T>* tmp)const {
+        if(tmp != nullptr){
+            q++;
+            if(tmp->filhoDireita != nullptr){
+                andar(q,tmp->filhoDireita);
+            }
+            if(tmp->filhoEsquerda != nullptr){
+                andar(q,tmp->filhoEsquerda);
+            }
+        }
+    }
+public:
+    //MinhaArvoreDeBuscaBinaria();
+    ~MinhaArvoreDeBuscaBinaria(){
+
+    };
 
     /**
      * @brief Verifica se a arvore esta vazia
      * @return Verdade se a arvore esta vazia.
      */
     bool vazia() const {
-        return false;
+        return this->_raiz == nullptr ? true : false;
     };
 
     /**
@@ -29,7 +44,9 @@ class MinhaArvoreDeBuscaBinaria : public ArvoreDeBuscaBinaria<T>
      * @return Numero natural que representa a quantidade de chaves na arvore
      */
     int quantidade() const {
-        return 0;
+        int *q = 0;
+        andar(q,this->_raiz);
+        return *q;
     };
 
     /**
@@ -90,7 +107,8 @@ class MinhaArvoreDeBuscaBinaria : public ArvoreDeBuscaBinaria<T>
      * @return Lista encadeada contendo as chaves em ordem.
      */
     ListaEncadeadaAbstrata<T>* emOrdem() const{
-
+        ListaEncadeadaAbstrata<T>* result;
+        return result;
     };
 
     /**
