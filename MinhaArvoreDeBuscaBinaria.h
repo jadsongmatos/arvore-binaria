@@ -14,14 +14,69 @@ template<typename T>
 class MinhaArvoreDeBuscaBinaria : public ArvoreDeBuscaBinaria<T>
 {
 protected:
-    void andar(int *q,Nodo<T>* tmp)const {
+    void quantidade_andar(int *q,Nodo<T>* tmp)const {
         if(tmp != nullptr){
             q++;
             if(tmp->filhoDireita != nullptr){
-                andar(q,tmp->filhoDireita);
+                quantidade_andar(q,tmp->filhoDireita);
             }
             if(tmp->filhoEsquerda != nullptr){
-                andar(q,tmp->filhoEsquerda);
+                quantidade_andar(q,tmp->filhoEsquerda);
+            }
+        }
+    }
+    void altura_andar(T chave,std::optional<int> *q,Nodo<T>* tmp) const{
+        if(tmp != nullptr){
+            if(tmp->chave != chave){
+                q++;
+                if(tmp->filhoDireita != nullptr){
+                    altura_andar(chave,q,tmp->filhoDireita);
+                }
+                if(tmp->filhoEsquerda != nullptr){
+                    altura_andar(chave,q,tmp->filhoEsquerda);
+                }
+            }
+        }
+    }
+    void contem_rec(T chave,bool * result,Nodo<T>* tmp){
+        if(tmp != nullptr){
+            if(tmp->chave != chave){
+                if(tmp->filhoDireita != nullptr){
+                    contem_rec(chave,tmp->filhoDireita);
+                }
+                if(tmp->filhoEsquerda != nullptr){
+                    contem_rec(chave,tmp->filhoEsquerda);
+                }
+            } else {
+                *result = true;
+            }
+        }
+    }
+    void filhoEsquerdaDe_rec(T chave,std::optional<T> *filho,Nodo<T>* tmp) const{
+        if(tmp != nullptr){
+            if(tmp->chave != chave){
+                if(tmp->filhoDireita != nullptr){
+                    filhoEsquerdaDe_rec(chave,filho,tmp->filhoDireita);
+                }
+                if(tmp->filhoEsquerda != nullptr){
+                    filhoEsquerdaDe_rec(chave,filho,tmp->filhoEsquerda);
+                }
+            } else {
+               *filho = tmp->filhoEsquerda->chave;
+            }
+        }
+    }
+    void filhoDireitaDe_rec(T chave,std::optional<T> *filho,Nodo<T>* tmp) const{
+        if(tmp != nullptr){
+            if(tmp->chave != chave){
+                if(tmp->filhoDireita != nullptr){
+                    filhoEsquerdaDe_rec(chave,filho,tmp->filhoDireita);
+                }
+                if(tmp->filhoEsquerda != nullptr){
+                    filhoEsquerdaDe_rec(chave,filho,tmp->filhoEsquerda);
+                }
+            } else {
+               *filho = tmp->filhoDireita->chave;
             }
         }
     }
@@ -44,8 +99,9 @@ public:
      * @return Numero natural que representa a quantidade de chaves na arvore
      */
     int quantidade() const {
-        int *q = 0;
-        andar(q,this->_raiz);
+        int *q;
+        *q = 0;
+        quantidade_andar(q,this->_raiz);
         return *q;
     };
 
@@ -55,7 +111,9 @@ public:
      * @return Verdade se a arvore contem a chave
      */
     bool contem(T chave) const{
-        return false;
+        bool * result;
+        *result = false;
+        return *result;
     };
 
     /**
@@ -64,7 +122,9 @@ public:
      * @return Numero inteiro representando a altura da (subarvore). Se chave nao esta na arvore, retorna std::nullopt
      */
     std::optional<int> altura(T chave) const{
-        return 0;
+        std::optional<int> *q;
+        altura_andar(chave,q,this->_raiz);
+        return *q;
     };
 
     /**
@@ -90,7 +150,9 @@ public:
      * @return Chave do filho a esquerda. Se chave nao esta na arvore, retorna std::nullopt
      */
     std::optional<T> filhoEsquerdaDe(T chave) const{
-        return chave;
+        std::optional<T> *filho;
+        filhoEsquerdaDe_rec(chave,filho,this->_raiz);
+        return *filho;
     };
 
     /**
@@ -99,7 +161,9 @@ public:
      * @return Chave do filho a direita. Se chave nao esta na arvore, retorna nullptr
      */
     std::optional<T> filhoDireitaDe(T chave) const{
-        return chave;
+        std::optional<T> *filho;
+        filhoDireitaDe_rec(chave,filho,this->_raiz);
+        return *filho;
     };
 
     /**
