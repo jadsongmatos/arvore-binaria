@@ -62,7 +62,7 @@ protected:
                     filhoEsquerdaDe_rec(chave,filho,tmp->filhoEsquerda);
                 }
             } else {
-               *filho = tmp->filhoEsquerda->chave;
+                *filho = tmp->filhoEsquerda->chave;
             }
         }
     }
@@ -76,7 +76,38 @@ protected:
                     filhoEsquerdaDe_rec(chave,filho,tmp->filhoEsquerda);
                 }
             } else {
-               *filho = tmp->filhoDireita->chave;
+                *filho = tmp->filhoDireita->chave;
+            }
+        }
+    }
+    void emOrdem_rec(MinhaListaEncadeada<T>* lista,Nodo<T>* tmp) const{
+        if(tmp->filhoDireita != nullptr){
+            lista->inserirNoInicio(tmp->filhoDireita->chave);
+            emOrdem_rec(lista,tmp->filhoDireita);
+        }
+        if(tmp->filhoEsquerda != nullptr){
+            lista->inserirNoFim(tmp->filhoEsquerda->chave);
+            emOrdem_rec(lista,tmp->filhoEsquerda);
+        }
+    }
+    void inserir_rec(T chave,Nodo<T>* tmp){
+        if(tmp->chave >= chave){
+            if(tmp->filhoDireita == nullptr){
+                Nodo<T>* newNodo = new Nodo<T>;;
+                newNodo->chave = chave;
+                newNodo->altura = newNodo->altura + 1;
+                tmp->filhoDireita = newNodo;
+            } else {
+                inserir_rec(chave,tmp->filhoDireita);
+            }
+        } else {
+            if(tmp->filhoEsquerda == nullptr){
+                Nodo<T>* newNodo = new Nodo<T>;;
+                newNodo->chave = chave;
+                newNodo->altura = tmp->altura + 1;
+                tmp->filhoEsquerda = newNodo;
+            } else {
+                inserir_rec(chave,tmp->filhoEsquerda);
             }
         }
     }
@@ -132,7 +163,14 @@ public:
      * @param chave chave a ser inserida
      */
     void inserir(T chave){
-
+        if(this->_raiz != nullptr){
+            inserir_rec(chave,this->_raiz);
+        } else {
+            Nodo<T> *newNodo = new Nodo<T>;
+            newNodo->chave = chave;
+            newNodo->altura = 0;
+            this->_raiz = newNodo;
+        }
     };
 
     /**
@@ -171,7 +209,10 @@ public:
      * @return Lista encadeada contendo as chaves em ordem.
      */
     ListaEncadeadaAbstrata<T>* emOrdem() const{
-        ListaEncadeadaAbstrata<T>* result;
+        MinhaListaEncadeada<T>* result = new MinhaListaEncadeada<T>;
+        if(this->_raiz != nullptr){
+            emOrdem_rec(result,this->_raiz);
+        }
         return result;
     };
 
@@ -180,7 +221,7 @@ public:
      * @return Lista encadeada contendo as chaves em pre-ordem.
      */
     ListaEncadeadaAbstrata<T>* preOrdem() const{
-        ListaEncadeadaAbstrata<T>* result;
+        MinhaListaEncadeada<T>* result = new MinhaListaEncadeada<T>;
         return result;
     };
 
@@ -189,7 +230,7 @@ public:
      * @return Lista encadeada contendo as chaves em pos ordem.
      */
     ListaEncadeadaAbstrata<T>* posOrdem() const{
-        ListaEncadeadaAbstrata<T>* result;
+        MinhaListaEncadeada<T>* result = new MinhaListaEncadeada<T>;
         return result;
     };
 };
