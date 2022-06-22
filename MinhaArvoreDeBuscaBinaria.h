@@ -72,44 +72,36 @@ protected:
                 if(tmp->filhoDireita != nullptr){
                     filhoEsquerdaDe_rec(chave,filho,tmp->filhoDireita);
                 }
-                if(tmp->filhoEsquerda != nullptr){
-                    filhoEsquerdaDe_rec(chave,filho,tmp->filhoEsquerda);
-                }
             } else {
                 *filho = tmp->filhoDireita->chave;
             }
         }
     }
     void emOrdem_rec(MinhaListaEncadeada<T>* lista,Nodo<T>* tmp) const{
-        if(tmp->filhoDireita != nullptr){
-            lista->inserirNoInicio(tmp->filhoDireita->chave);
+        if(tmp != nullptr){
+            lista->inserirNoInicio(tmp->chave);
             emOrdem_rec(lista,tmp->filhoDireita);
-        }
-        if(tmp->filhoEsquerda != nullptr){
-            lista->inserirNoFim(tmp->filhoEsquerda->chave);
             emOrdem_rec(lista,tmp->filhoEsquerda);
         }
     }
     void inserir_rec(T chave,Nodo<T>* tmp){
         if(tmp->chave >= chave){
             if(tmp->filhoDireita == nullptr){
-                Nodo<T>* newNodo = new Nodo<T>;;
-                newNodo->chave = chave;
-                newNodo->altura = newNodo->altura + 1;
-                tmp->filhoDireita = newNodo;
+                tmp->filhoDireita = new Nodo<T>;
+                tmp->filhoDireita->chave = chave;
             } else {
                 inserir_rec(chave,tmp->filhoDireita);
             }
         } else {
             if(tmp->filhoEsquerda == nullptr){
-                Nodo<T>* newNodo = new Nodo<T>;;
-                newNodo->chave = chave;
-                newNodo->altura = tmp->altura + 1;
-                tmp->filhoEsquerda = newNodo;
+                tmp->filhoEsquerda = new Nodo<T>;
+                tmp->filhoEsquerda->chave = chave;
             } else {
                 inserir_rec(chave,tmp->filhoEsquerda);
             }
         }
+        tmp->altura = tmp->altura / 2;
+        tmp->altura++;
     }
 public:
     //MinhaArvoreDeBuscaBinaria();
@@ -165,11 +157,10 @@ public:
     void inserir(T chave){
         if(this->_raiz != nullptr){
             inserir_rec(chave,this->_raiz);
+            this->_raiz->altura = this->_raiz->filhoDireita->altura + 1;
         } else {
-            Nodo<T> *newNodo = new Nodo<T>;
-            newNodo->chave = chave;
-            newNodo->altura = 0;
-            this->_raiz = newNodo;
+            this->_raiz = new Nodo<T>;
+            this->_raiz->chave = chave;
         }
     };
 
