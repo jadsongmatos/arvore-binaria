@@ -79,13 +79,28 @@ protected:
     }
     void emOrdem_rec(MinhaListaEncadeada<T>* lista,Nodo<T>* tmp) const{
         if(tmp != nullptr){
-            lista->inserirNoInicio(tmp->chave);
-            emOrdem_rec(lista,tmp->filhoDireita);
             emOrdem_rec(lista,tmp->filhoEsquerda);
+            lista->inserirNoFim(tmp->chave);
+            emOrdem_rec(lista,tmp->filhoDireita);
+        }
+    }
+    void preOrdem_rec(MinhaListaEncadeada<T>* lista,Nodo<T>* tmp) const{
+        if(tmp != nullptr){
+            lista->inserirNoFim(tmp->chave);
+            preOrdem_rec(lista,tmp->filhoEsquerda);
+            preOrdem_rec(lista,tmp->filhoDireita);
+        }
+    }
+    void posOrdem_rec(MinhaListaEncadeada<T>* lista,Nodo<T>* tmp) const{
+        if(tmp != nullptr){
+            posOrdem_rec(lista,tmp->filhoEsquerda);
+            posOrdem_rec(lista,tmp->filhoDireita);
+            lista->inserirNoFim(tmp->chave);
+
         }
     }
     void inserir_rec(T chave,Nodo<T>* tmp){
-        if(tmp->chave >= chave){
+        if(chave >= tmp->chave){
             if(tmp->filhoDireita == nullptr){
                 tmp->filhoDireita = new Nodo<T>;
                 tmp->filhoDireita->chave = chave;
@@ -102,6 +117,28 @@ protected:
         }
         tmp->altura = tmp->altura / 2;
         tmp->altura++;
+    }
+    void remover_rec(T chave,Nodo<T>* tmp){
+        if(tmp->filhoDireita == chave){
+            if(tmp->filhoDireita->filhoDireita != nullptr){
+
+            }
+            if(tmp->filhoEsquerda->filhoEsquerda != nullptr){
+
+            }
+            delete tmp->filhoDireita;
+        }
+        if(tmp->filhoEsquerda == chave){
+            if(tmp->filhoDireita->filhoDireita != nullptr){
+
+            }
+            if(tmp->filhoEsquerda->filhoEsquerda != nullptr){
+
+            }
+            tmp->filhoEsquerda;
+        }
+        tmp->altura = tmp->altura / 2;
+        tmp->altura--;
     }
 public:
     //MinhaArvoreDeBuscaBinaria();
@@ -157,7 +194,7 @@ public:
     void inserir(T chave){
         if(this->_raiz != nullptr){
             inserir_rec(chave,this->_raiz);
-            this->_raiz->altura = this->_raiz->filhoDireita->altura + 1;
+            this->_raiz->altura = this->_raiz->filhoEsquerda->altura + 1;
         } else {
             this->_raiz = new Nodo<T>;
             this->_raiz->chave = chave;
@@ -170,7 +207,9 @@ public:
      * @return Retorna a chave removida ou nullptr se a chave nao esta na arvore
      */
     void remover(T chave){
-
+        if(this->_raiz != nullptr){
+            remover_rec(chave,this->_raiz);
+        }
     };
 
     /**
@@ -200,7 +239,7 @@ public:
      * @return Lista encadeada contendo as chaves em ordem.
      */
     ListaEncadeadaAbstrata<T>* emOrdem() const{
-        MinhaListaEncadeada<T>* result = new MinhaListaEncadeada<T>;
+        MinhaListaEncadeada<T>* result = new MinhaListaEncadeada<T>();
         if(this->_raiz != nullptr){
             emOrdem_rec(result,this->_raiz);
         }
@@ -212,7 +251,10 @@ public:
      * @return Lista encadeada contendo as chaves em pre-ordem.
      */
     ListaEncadeadaAbstrata<T>* preOrdem() const{
-        MinhaListaEncadeada<T>* result = new MinhaListaEncadeada<T>;
+        MinhaListaEncadeada<T>* result = new MinhaListaEncadeada<T>();
+        if(this->_raiz != nullptr){
+            preOrdem_rec(result,this->_raiz);
+        }
         return result;
     };
 
@@ -221,7 +263,10 @@ public:
      * @return Lista encadeada contendo as chaves em pos ordem.
      */
     ListaEncadeadaAbstrata<T>* posOrdem() const{
-        MinhaListaEncadeada<T>* result = new MinhaListaEncadeada<T>;
+        MinhaListaEncadeada<T>* result = new MinhaListaEncadeada<T>();
+        if(this->_raiz != nullptr){
+            posOrdem_rec(result,this->_raiz);
+        }
         return result;
     };
 };
