@@ -70,7 +70,7 @@ protected:
         if(tmp != nullptr){
             if(tmp->chave != chave){
                 if(tmp->filhoDireita != nullptr){
-                    filhoEsquerdaDe_rec(chave,filho,tmp->filhoDireita);
+                    filhoDireitaDe_rec(chave,filho,tmp->filhoDireita);
                 }
             } else {
                 *filho = tmp->filhoDireita->chave;
@@ -118,27 +118,54 @@ protected:
         tmp->altura = tmp->altura / 2;
         tmp->altura++;
     }
-    void remover_rec(T chave,Nodo<T>* tmp){
-        if(tmp->filhoDireita == chave){
-            if(tmp->filhoDireita->filhoDireita != nullptr){
+    void remover_rec(Nodo<T> * root,T chave){
+        if (root != nullptr) {
+            if (chave < root->chave) {
+                deleteNode(root->filhoDireita, chave);
+            } else if (chave > root->chave) {
+                remover_rec(root->filhoEsquerda, chave);
+            } else {
+                if (root->filhoDireita == nullptr && root->filhoEsquerda == nullptr)
+                {
+                    delete root;
+                    root = nullptr;
+                } else if (root->filhoDireita && root->filhoEsquerda){
+                    Nodo<T> * predecessor = get_max(root->filhoDireita);
 
-            }
-            if(tmp->filhoEsquerda->filhoEsquerda != nullptr){
+                    root->data = predecessor->chave;
+                    remover_rec(root->filhoDireita, predecessor->chave);
+                } else {
+                    // choose a child node
+                    Nodo<T> * child = (root->filhoDireita)? root->filhoDireita: root->filhoEsquerda;
+                    Nodo<T> * curr = root;
 
+                    root = child;
+                    delete curr;
+                }
             }
-            delete tmp->filhoDireita;
         }
-        if(tmp->filhoEsquerda == chave){
-            if(tmp->filhoDireita->filhoDireita != nullptr){
 
+    }
+    void get_rec(Nodo<T>* tmp, T chave,Nodo<T>* filho){
+        if(tmp != nullptr){
+            if(tmp->chave != chave){
+                filho = tmp;
+                if (chave > tmp->chave) {
+                    tmp = tmp->filhoDireita;
+                }
+                else {
+                    tmp = tmp->filhoEsquerda;
+                }
             }
-            if(tmp->filhoEsquerda->filhoEsquerda != nullptr){
-
-            }
-            tmp->filhoEsquerda;
+            get_rec(tmp);
         }
-        tmp->altura = tmp->altura / 2;
-        tmp->altura--;
+    }
+    Nodo<T>* get_max(Nodo<T>* tmp)
+    {
+        while (tmp->filhoEsquerda != nullptr) {
+            tmp = tmp->filhoEsquerda;
+        }
+        return tmp;
     }
 public:
     //MinhaArvoreDeBuscaBinaria();
@@ -207,9 +234,7 @@ public:
      * @return Retorna a chave removida ou nullptr se a chave nao esta na arvore
      */
     void remover(T chave){
-        if(this->_raiz != nullptr){
-            remover_rec(chave,this->_raiz);
-        }
+        remover_rec(chave);
     };
 
     /**
