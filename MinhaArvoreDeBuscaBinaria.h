@@ -16,7 +16,7 @@ class MinhaArvoreDeBuscaBinaria : public ArvoreDeBuscaBinaria<T>
 protected:
     void quantidade_andar(int *q,Nodo<T>* tmp)const {
         if(tmp != nullptr){
-            q++;
+            (*q)++;
             if(tmp->filhoDireita != nullptr){
                 quantidade_andar(q,tmp->filhoDireita);
             }
@@ -27,54 +27,55 @@ protected:
     }
     void altura_andar(T chave,std::optional<int> *q,Nodo<T>* tmp) const{
         if(tmp != nullptr){
-            if(tmp->chave != chave){
-                q++;
-                if(tmp->filhoDireita != nullptr){
-                    altura_andar(chave,q,tmp->filhoDireita);
+            if(tmp != nullptr){
+                if(chave == tmp->chave) {
+                    *q = tmp->altura;
+                    return;
+                } else if (chave > tmp->chave) {
+                    tmp = tmp->filhoDireita;
+                } else if(chave < tmp->chave) {
+                    tmp = tmp->filhoEsquerda;
                 }
-                if(tmp->filhoEsquerda != nullptr){
-                    altura_andar(chave,q,tmp->filhoEsquerda);
-                }
+                altura_andar(chave,q,tmp);
             }
         }
     }
-    void contem_rec(T chave,bool * result,Nodo<T>* tmp){
+    bool contem_rec(T chave,Nodo<T>* tmp)const{
         if(tmp != nullptr){
-            if(tmp->chave != chave){
-                if(tmp->filhoDireita != nullptr){
-                    contem_rec(chave,tmp->filhoDireita);
+            if(tmp != nullptr){
+                if(chave == tmp->chave) {
+                    return true;
+                } else if (chave > tmp->chave) {
+                    tmp = tmp->filhoDireita;
+                } else if(chave < tmp->chave) {
+                    tmp = tmp->filhoEsquerda;
                 }
-                if(tmp->filhoEsquerda != nullptr){
-                    contem_rec(chave,tmp->filhoEsquerda);
-                }
-            } else {
-                *result = true;
+                return contem_rec(chave,tmp);
             }
         }
     }
-    void filhoEsquerdaDe_rec(T chave,std::optional<T> *filho,Nodo<T>* tmp) const{
+    std::optional<T> filhoEsquerdaDe_rec(T chave,Nodo<T>* tmp) const{
         if(tmp != nullptr){
-            if(tmp->chave != chave){
-                if(tmp->filhoDireita != nullptr){
-                    filhoEsquerdaDe_rec(chave,filho,tmp->filhoDireita);
-                }
-                if(tmp->filhoEsquerda != nullptr){
-                    filhoEsquerdaDe_rec(chave,filho,tmp->filhoEsquerda);
-                }
-            } else {
-                *filho = tmp->filhoEsquerda->chave;
+            if(tmp->filhoEsquerda != nullptr && chave == tmp->chave) {
+                return tmp->filhoEsquerda->chave;
+            } else if (chave > tmp->chave) {
+                tmp = tmp->filhoDireita;
+            } else if(chave < tmp->chave) {
+                tmp = tmp->filhoEsquerda;
             }
+            return filhoEsquerdaDe_rec(chave,tmp);
         }
     }
-    void filhoDireitaDe_rec(T chave,std::optional<T> *filho,Nodo<T>* tmp) const{
+    std::optional<T> filhoDireitaDe_rec(T chave,Nodo<T>* tmp) const{
         if(tmp != nullptr){
-            if(tmp->chave != chave){
-                if(tmp->filhoDireita != nullptr){
-                    filhoDireitaDe_rec(chave,filho,tmp->filhoDireita);
-                }
-            } else {
-                *filho = tmp->filhoDireita->chave;
+            if(tmp->filhoDireita != nullptr && chave == tmp->chave) {
+                return tmp->filhoDireita->chave;
+            } else if (chave > tmp->chave) {
+                tmp = tmp->filhoDireita;
+            } else if(chave < tmp->chave) {
+                tmp = tmp->filhoEsquerda;
             }
+            return filhoDireitaDe_rec(chave,tmp);
         }
     }
     void emOrdem_rec(MinhaListaEncadeada<T>* lista,Nodo<T>* tmp) const{
@@ -120,22 +121,50 @@ protected:
     }
     void remover_rec(Nodo<T> * root,T chave){
         if (root != nullptr) {
-            if (chave < root->chave) {
-                deleteNode(root->filhoDireita, chave);
-            } else if (chave > root->chave) {
+            if (chave > root->chave) {
+                remover_rec(root->filhoDireita, chave);
+                if (root->filhoDireita != nullptr){
+                    if (root->filhoDireita->altura == -1){
+                        Nodo<T> * tmp = root->filhoDireita;
+                        root->filhoDireita = nullptr;
+                        delete tmp;
+                    }
+                }
+                if (root->filhoEsquerda != nullptr){
+                    if (root->filhoEsquerda->altura == -1){
+                        Nodo<T> * tmp = root->filhoEsquerda;
+                        root->filhoEsquerda = nullptr;
+                        delete tmp;
+                    }
+                }
+                root->altura--;
+            } else if (chave < root->chave) {
                 remover_rec(root->filhoEsquerda, chave);
+                if (root->filhoDireita != nullptr){
+                    if (root->filhoDireita->altura == -1){
+                        Nodo<T> * tmp = root->filhoDireita;
+                        root->filhoDireita = nullptr;
+                        delete tmp;
+                    }
+                }
+                if (root->filhoEsquerda == nullptr){
+                    if (root->filhoEsquerda->altura == -1){
+                        Nodo<T> * tmp = root->filhoEsquerda;
+                        root->filhoEsquerda = nullptr;
+                        delete tmp;
+                    }
+                }
+                root->altura--;
             } else {
-                if (root->filhoDireita == nullptr && root->filhoEsquerda == nullptr)
-                {
-                    delete root;
-                    root = nullptr;
+                if (root->filhoDireita == nullptr && root->filhoEsquerda == nullptr){
+                    root->altura = -1;
                 } else if (root->filhoDireita && root->filhoEsquerda){
                     Nodo<T> * predecessor = get_max(root->filhoDireita);
 
-                    root->data = predecessor->chave;
+                    root->chave = predecessor->chave;
                     remover_rec(root->filhoDireita, predecessor->chave);
+                    root->altura--;
                 } else {
-                    // choose a child node
                     Nodo<T> * child = (root->filhoDireita)? root->filhoDireita: root->filhoEsquerda;
                     Nodo<T> * curr = root;
 
@@ -144,7 +173,6 @@ protected:
                 }
             }
         }
-
     }
     void get_rec(Nodo<T>* tmp, T chave,Nodo<T>* filho){
         if(tmp != nullptr){
@@ -198,9 +226,11 @@ public:
      * @return Verdade se a arvore contem a chave
      */
     bool contem(T chave) const{
-        bool * result;
-        *result = false;
-        return *result;
+        bool result = false;
+
+        result = contem_rec(chave,this->_raiz);
+
+        return result;
     };
 
     /**
@@ -234,7 +264,8 @@ public:
      * @return Retorna a chave removida ou nullptr se a chave nao esta na arvore
      */
     void remover(T chave){
-        remover_rec(chave);
+        remover_rec(this->_raiz,chave);
+        int a = 0;
     };
 
     /**
@@ -243,9 +274,17 @@ public:
      * @return Chave do filho a esquerda. Se chave nao esta na arvore, retorna std::nullopt
      */
     std::optional<T> filhoEsquerdaDe(T chave) const{
-        std::optional<T> *filho;
-        filhoEsquerdaDe_rec(chave,filho,this->_raiz);
-        return *filho;
+        std::optional<T> filho;
+        if(this->_raiz != nullptr){
+            if(this->_raiz->chave != chave){
+                filho = filhoEsquerdaDe_rec(chave,this->_raiz);
+            } else {
+                filho = this->_raiz->filhoEsquerda->chave;
+            }
+        }
+
+
+        return filho;
     };
 
     /**
@@ -254,9 +293,17 @@ public:
      * @return Chave do filho a direita. Se chave nao esta na arvore, retorna nullptr
      */
     std::optional<T> filhoDireitaDe(T chave) const{
-        std::optional<T> *filho;
-        filhoDireitaDe_rec(chave,filho,this->_raiz);
-        return *filho;
+        std::optional<T> filho;
+        if(this->_raiz != nullptr){
+            if(this->_raiz->chave != chave){
+                filho = filhoDireitaDe_rec(chave,this->_raiz);
+            } else {
+                if(this->_raiz->filhoDireita != nullptr){
+                    filho = this->_raiz->filhoDireita->chave;
+                }
+            }
+        }
+        return filho;
     };
 
     /**
