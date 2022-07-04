@@ -27,11 +27,11 @@ protected:
     }
     void altura_andar(T chave,std::optional<int> *q,Nodo<T>* tmp) const{
         if(tmp != nullptr){
-            if(tmp != nullptr){
-                if(chave == tmp->chave) {
-                    *q = tmp->altura;
-                    return;
-                } else if (chave > tmp->chave) {
+            if(chave == tmp->chave) {
+                *q = tmp->altura;
+                return;
+            } else {
+                if (chave > tmp->chave) {
                     tmp = tmp->filhoDireita;
                 } else if(chave < tmp->chave) {
                     tmp = tmp->filhoEsquerda;
@@ -56,25 +56,37 @@ protected:
     }
     std::optional<T> filhoEsquerdaDe_rec(T chave,Nodo<T>* tmp) const{
         if(tmp != nullptr){
-            if(tmp->filhoEsquerda != nullptr && chave == tmp->chave) {
-                return tmp->filhoEsquerda->chave;
+            if(chave == tmp->chave) {
+                if(tmp->filhoEsquerda == nullptr){
+                    return std::nullopt;
+                } else {
+                    return tmp->filhoEsquerda->chave;
+                }
+
             } else if (chave > tmp->chave) {
                 tmp = tmp->filhoDireita;
             } else if(chave < tmp->chave) {
                 tmp = tmp->filhoEsquerda;
             }
+
             return filhoEsquerdaDe_rec(chave,tmp);
         }
     }
     std::optional<T> filhoDireitaDe_rec(T chave,Nodo<T>* tmp) const{
         if(tmp != nullptr){
-            if(tmp->filhoDireita != nullptr && chave == tmp->chave) {
-                return tmp->filhoDireita->chave;
+            if(chave == tmp->chave) {
+                if(tmp->filhoDireita == nullptr){
+                    return std::nullopt;
+                } else {
+                    return tmp->filhoDireita->chave;
+                }
+
             } else if (chave > tmp->chave) {
                 tmp = tmp->filhoDireita;
             } else if(chave < tmp->chave) {
                 tmp = tmp->filhoEsquerda;
             }
+
             return filhoDireitaDe_rec(chave,tmp);
         }
     }
@@ -101,23 +113,22 @@ protected:
         }
     }
     void inserir_rec(T chave,Nodo<T>* tmp){
-        if(chave >= tmp->chave){
-            if(tmp->filhoDireita == nullptr){
-                tmp->filhoDireita = new Nodo<T>;
-                tmp->filhoDireita->chave = chave;
+        /*if (tmp != nullptr) {
+            if (chave < tmp->chave) {
+                tmp = tmp->filhoEsquerda;
+                inserir_rec(chave,tmp->filhoEsquerda);
             } else {
+                tmp = tmp->filhoDireita;
                 inserir_rec(chave,tmp->filhoDireita);
             }
+            tmp->altura = tmp->altura / 2;
+            tmp->altura++;
+
         } else {
-            if(tmp->filhoEsquerda == nullptr){
-                tmp->filhoEsquerda = new Nodo<T>;
-                tmp->filhoEsquerda->chave = chave;
-            } else {
-                inserir_rec(chave,tmp->filhoEsquerda);
-            }
-        }
-        tmp->altura = tmp->altura / 2;
-        tmp->altura++;
+            tmp = new Nodo<T>;
+            tmp->chave = chave;
+        }*/
+
     }
     void remover_rec(Nodo<T> * root,T chave){
         if (root != nullptr) {
@@ -137,7 +148,6 @@ protected:
                         delete tmp;
                     }
                 }
-                root->altura--;
             } else if (chave < root->chave) {
                 remover_rec(root->filhoEsquerda, chave);
                 if (root->filhoDireita != nullptr){
@@ -147,14 +157,13 @@ protected:
                         delete tmp;
                     }
                 }
-                if (root->filhoEsquerda == nullptr){
+                if (root->filhoEsquerda != nullptr){
                     if (root->filhoEsquerda->altura == -1){
                         Nodo<T> * tmp = root->filhoEsquerda;
                         root->filhoEsquerda = nullptr;
                         delete tmp;
                     }
                 }
-                root->altura--;
             } else {
                 if (root->filhoDireita == nullptr && root->filhoEsquerda == nullptr){
                     root->altura = -1;
@@ -249,13 +258,7 @@ public:
      * @param chave chave a ser inserida
      */
     void inserir(T chave){
-        if(this->_raiz != nullptr){
-            inserir_rec(chave,this->_raiz);
-            this->_raiz->altura = this->_raiz->filhoEsquerda->altura + 1;
-        } else {
-            this->_raiz = new Nodo<T>;
-            this->_raiz->chave = chave;
-        }
+        inserir_rec(chave,this->_raiz);
     };
 
     /**
@@ -265,7 +268,6 @@ public:
      */
     void remover(T chave){
         remover_rec(this->_raiz,chave);
-        int a = 0;
     };
 
     /**
