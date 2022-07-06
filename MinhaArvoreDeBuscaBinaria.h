@@ -25,21 +25,7 @@ protected:
             }
         }
     }
-    void altura_andar(T chave,std::optional<int> *q,Nodo<T>* tmp) const{
-        if(tmp != nullptr){
-            if(chave == tmp->chave) {
-                *q = tmp->altura;
-                return;
-            } else {
-                if (chave > tmp->chave) {
-                    tmp = tmp->filhoDireita;
-                } else if(chave < tmp->chave) {
-                    tmp = tmp->filhoEsquerda;
-                }
-                altura_andar(chave,q,tmp);
-            }
-        }
-    }
+
     bool contem_rec(T chave,Nodo<T>* tmp)const{
         if(tmp != nullptr){
             if(tmp != nullptr){
@@ -54,6 +40,7 @@ protected:
             }
         }
     }
+
     std::optional<T> filhoEsquerdaDe_rec(T chave,Nodo<T>* tmp) const{
         if(tmp != nullptr){
             if(chave == tmp->chave) {
@@ -72,6 +59,7 @@ protected:
             return filhoEsquerdaDe_rec(chave,tmp);
         }
     }
+
     std::optional<T> filhoDireitaDe_rec(T chave,Nodo<T>* tmp) const{
         if(tmp != nullptr){
             if(chave == tmp->chave) {
@@ -90,6 +78,7 @@ protected:
             return filhoDireitaDe_rec(chave,tmp);
         }
     }
+
     void emOrdem_rec(MinhaListaEncadeada<T>* lista,Nodo<T>* tmp) const{
         if(tmp != nullptr){
             emOrdem_rec(lista,tmp->filhoEsquerda);
@@ -97,6 +86,7 @@ protected:
             emOrdem_rec(lista,tmp->filhoDireita);
         }
     }
+
     void preOrdem_rec(MinhaListaEncadeada<T>* lista,Nodo<T>* tmp) const{
         if(tmp != nullptr){
             lista->inserirNoFim(tmp->chave);
@@ -104,6 +94,7 @@ protected:
             preOrdem_rec(lista,tmp->filhoDireita);
         }
     }
+
     void posOrdem_rec(MinhaListaEncadeada<T>* lista,Nodo<T>* tmp) const{
         if(tmp != nullptr){
             posOrdem_rec(lista,tmp->filhoEsquerda);
@@ -112,24 +103,27 @@ protected:
 
         }
     }
+
     void inserir_rec(T chave,Nodo<T>* tmp){
-        /*if (tmp != nullptr) {
-            if (chave < tmp->chave) {
-                tmp = tmp->filhoEsquerda;
+        if (chave < tmp->chave) {
+            if (tmp->filhoEsquerda != nullptr) {
                 inserir_rec(chave,tmp->filhoEsquerda);
             } else {
-                tmp = tmp->filhoDireita;
-                inserir_rec(chave,tmp->filhoDireita);
+                tmp->filhoEsquerda = new Nodo<T>;
+                tmp->filhoEsquerda->chave = chave;
             }
-            tmp->altura = tmp->altura / 2;
-            tmp->altura++;
-
         } else {
-            tmp = new Nodo<T>;
-            tmp->chave = chave;
-        }*/
-
+            if (tmp->filhoDireita != nullptr) {
+                inserir_rec(chave,tmp->filhoDireita);
+            } else {
+                tmp->filhoDireita = new Nodo<T>;
+                tmp->filhoDireita->chave = chave;
+            }
+        }
+        tmp->altura = tmp->altura / 2;
+        tmp->altura++;
     }
+
     void remover_rec(Nodo<T> * root,T chave){
         if (root != nullptr) {
             if (chave > root->chave) {
@@ -183,22 +177,21 @@ protected:
             }
         }
     }
-    void get_rec(Nodo<T>* tmp, T chave,Nodo<T>* filho){
+
+    void get_rec(T chave,Nodo<T>* tmp)const{
         if(tmp != nullptr){
-            if(tmp->chave != chave){
-                filho = tmp;
-                if (chave > tmp->chave) {
-                    tmp = tmp->filhoDireita;
-                }
-                else {
-                    tmp = tmp->filhoEsquerda;
-                }
+            if(chave == tmp->chave) {
+                return;
+            } else if (chave > tmp->chave) {
+                tmp = tmp->filhoDireita;
+            } else if(chave < tmp->chave) {
+                tmp = tmp->filhoEsquerda;
             }
-            get_rec(tmp);
+            get_rec(chave,tmp);
         }
     }
-    Nodo<T>* get_max(Nodo<T>* tmp)
-    {
+
+    Nodo<T>* get_max(Nodo<T>* tmp) {
         while (tmp->filhoEsquerda != nullptr) {
             tmp = tmp->filhoEsquerda;
         }
@@ -247,10 +240,14 @@ public:
      * @param chave chave que é raiz da (sub)arvore cuja altura queremos. Se chave é nula, retorna a altura da arvore.
      * @return Numero inteiro representando a altura da (subarvore). Se chave nao esta na arvore, retorna std::nullopt
      */
-    std::optional<int> altura(T chave) const{
-        std::optional<int> *q;
-        altura_andar(chave,q,this->_raiz);
-        return *q;
+    std::optional<int> altura(T chave)const {
+        Nodo<T>* nodo = this->_raiz;
+        get_rec(chave,nodo);
+        std::optional<int> q;
+        if(nodo != nullptr){
+            q = nodo->altura;
+        }
+        return q;
     };
 
     /**
@@ -258,7 +255,19 @@ public:
      * @param chave chave a ser inserida
      */
     void inserir(T chave){
-        inserir_rec(chave,this->_raiz);
+        if (this->_raiz != nullptr) {
+            inserir_rec(chave,this->_raiz);
+        } else {
+            this->_raiz = new Nodo<T>;
+            this->_raiz->chave = chave;
+        }
+        if(this->_raiz->filhoEsquerda != nullptr){
+            this->_raiz->altura = this->_raiz->filhoEsquerda->altura + 1;
+        }
+        if(this->_raiz->filhoDireita != nullptr){
+            this->_raiz->altura = this->_raiz->altura - 1 + this->_raiz->filhoDireita->altura;
+        }
+
     };
 
     /**
