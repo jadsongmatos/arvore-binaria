@@ -23,6 +23,16 @@ protected:
         return 0;
     }
 
+    void remover_all(Nodo<T> *tmp)
+    {
+        if (tmp != nullptr)
+        {
+            remover_all(tmp->filhoEsquerda);
+            remover_all(tmp->filhoDireita);
+            delete tmp;
+        }
+    }
+
     bool contem_rec(T chave, Nodo<T> *tmp) const
     {
         if (tmp != nullptr)
@@ -228,15 +238,20 @@ protected:
                 }
                 else
                 {
-                    if(root->filhoDireita){
+                    if (root->filhoDireita)
+                    {
                         Nodo<T> *child = root->filhoDireita;
                         root->chave = child->chave;
                         root->filhoDireita = nullptr;
+                        root->altura = 0;
                         delete child;
-                    } else {
+                    }
+                    else
+                    {
                         Nodo<T> *child = root->filhoEsquerda;
                         root->chave = child->chave;
                         root->filhoEsquerda = nullptr;
+                        root->altura = 0;
                         delete child;
                     }
                 }
@@ -281,7 +296,7 @@ protected:
 public:
     // MinhaArvoreDeBuscaBinaria();
     ~MinhaArvoreDeBuscaBinaria(){
-
+        remover_all(this->_raiz);
     };
 
     /**
@@ -366,6 +381,25 @@ public:
     void remover(T chave)
     {
         remover_rec(this->_raiz, chave);
+        if (this->_raiz)
+        {
+            if (this->_raiz->altura == -1)
+            {
+                delete this->_raiz;
+                this->_raiz = nullptr;
+            }
+            else
+            {
+                if (this->_raiz->filhoEsquerda != nullptr)
+                {
+                    this->_raiz->altura = this->_raiz->filhoEsquerda->altura + 1;
+                }
+                if (this->_raiz->filhoDireita != nullptr)
+                {
+                    this->_raiz->altura = this->_raiz->altura - 1 + this->_raiz->filhoDireita->altura;
+                }
+            }
+        }
     };
 
     /**
