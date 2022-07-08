@@ -10,195 +10,276 @@
  *
  * @tparam T O tipo de dado guardado na árvore.
  */
-template<typename T>
+template <typename T>
 class MinhaArvoreDeBuscaBinaria : public ArvoreDeBuscaBinaria<T>
 {
 protected:
-    void quantidade_andar(int *q,Nodo<T>* tmp)const {
-        if(tmp != nullptr){
-            (*q)++;
-            if(tmp->filhoDireita != nullptr){
-                quantidade_andar(q,tmp->filhoDireita);
-            }
-            if(tmp->filhoEsquerda != nullptr){
-                quantidade_andar(q,tmp->filhoEsquerda);
-            }
+    int quantidade_andar(Nodo<T> *tmp) const
+    {
+        if (tmp != nullptr)
+        {
+            return quantidade_andar(tmp->filhoEsquerda) + quantidade_andar(tmp->filhoDireita) + 1;
         }
+        return 0;
     }
 
-    bool contem_rec(T chave,Nodo<T>* tmp)const{
-        if(tmp != nullptr){
-            if(tmp != nullptr){
-                if(chave == tmp->chave) {
-                    return true;
-                } else if (chave > tmp->chave) {
-                    tmp = tmp->filhoDireita;
-                } else if(chave < tmp->chave) {
-                    tmp = tmp->filhoEsquerda;
-                }
-                return contem_rec(chave,tmp);
+    bool contem_rec(T chave, Nodo<T> *tmp) const
+    {
+        if (tmp != nullptr)
+        {
+            if (chave == tmp->chave)
+            {
+                return true;
             }
+            else if (chave > tmp->chave)
+            {
+                tmp = tmp->filhoDireita;
+            }
+            else if (chave < tmp->chave)
+            {
+                tmp = tmp->filhoEsquerda;
+            }
+            return contem_rec(chave, tmp);
         }
+        return false;
     }
 
-    std::optional<T> filhoEsquerdaDe_rec(T chave,Nodo<T>* tmp) const{
-        if(tmp != nullptr){
-            if(chave == tmp->chave) {
-                if(tmp->filhoEsquerda == nullptr){
+    std::optional<T> filhoEsquerdaDe_rec(T chave, Nodo<T> *tmp) const
+    {
+        if (tmp != nullptr)
+        {
+            if (chave == tmp->chave)
+            {
+                if (tmp->filhoEsquerda == nullptr)
+                {
                     return std::nullopt;
-                } else {
+                }
+                else
+                {
                     return tmp->filhoEsquerda->chave;
                 }
-
-            } else if (chave > tmp->chave) {
+            }
+            else if (chave > tmp->chave)
+            {
                 tmp = tmp->filhoDireita;
-            } else if(chave < tmp->chave) {
+            }
+            else if (chave < tmp->chave)
+            {
                 tmp = tmp->filhoEsquerda;
             }
 
-            return filhoEsquerdaDe_rec(chave,tmp);
+            return filhoEsquerdaDe_rec(chave, tmp);
         }
     }
 
-    std::optional<T> filhoDireitaDe_rec(T chave,Nodo<T>* tmp) const{
-        if(tmp != nullptr){
-            if(chave == tmp->chave) {
-                if(tmp->filhoDireita == nullptr){
+    std::optional<T> filhoDireitaDe_rec(T chave, Nodo<T> *tmp) const
+    {
+        if (tmp != nullptr)
+        {
+            if (chave == tmp->chave)
+            {
+                if (tmp->filhoDireita == nullptr)
+                {
                     return std::nullopt;
-                } else {
+                }
+                else
+                {
                     return tmp->filhoDireita->chave;
                 }
-
-            } else if (chave > tmp->chave) {
+            }
+            else if (chave > tmp->chave)
+            {
                 tmp = tmp->filhoDireita;
-            } else if(chave < tmp->chave) {
+            }
+            else if (chave < tmp->chave)
+            {
                 tmp = tmp->filhoEsquerda;
             }
 
-            return filhoDireitaDe_rec(chave,tmp);
+            return filhoDireitaDe_rec(chave, tmp);
         }
     }
 
-    void emOrdem_rec(MinhaListaEncadeada<T>* lista,Nodo<T>* tmp) const{
-        if(tmp != nullptr){
-            emOrdem_rec(lista,tmp->filhoEsquerda);
+    void emOrdem_rec(MinhaListaEncadeada<T> *lista, Nodo<T> *tmp) const
+    {
+        if (tmp != nullptr)
+        {
+            emOrdem_rec(lista, tmp->filhoEsquerda);
             lista->inserirNoFim(tmp->chave);
-            emOrdem_rec(lista,tmp->filhoDireita);
+            emOrdem_rec(lista, tmp->filhoDireita);
         }
     }
 
-    void preOrdem_rec(MinhaListaEncadeada<T>* lista,Nodo<T>* tmp) const{
-        if(tmp != nullptr){
+    void preOrdem_rec(MinhaListaEncadeada<T> *lista, Nodo<T> *tmp) const
+    {
+        if (tmp != nullptr)
+        {
             lista->inserirNoFim(tmp->chave);
-            preOrdem_rec(lista,tmp->filhoEsquerda);
-            preOrdem_rec(lista,tmp->filhoDireita);
+            preOrdem_rec(lista, tmp->filhoEsquerda);
+            preOrdem_rec(lista, tmp->filhoDireita);
         }
     }
 
-    void posOrdem_rec(MinhaListaEncadeada<T>* lista,Nodo<T>* tmp) const{
-        if(tmp != nullptr){
-            posOrdem_rec(lista,tmp->filhoEsquerda);
-            posOrdem_rec(lista,tmp->filhoDireita);
+    void posOrdem_rec(MinhaListaEncadeada<T> *lista, Nodo<T> *tmp) const
+    {
+        if (tmp != nullptr)
+        {
+            posOrdem_rec(lista, tmp->filhoEsquerda);
+            posOrdem_rec(lista, tmp->filhoDireita);
             lista->inserirNoFim(tmp->chave);
-
         }
     }
 
-    void inserir_rec(T chave,Nodo<T>* tmp){
-        if (chave < tmp->chave) {
-            if (tmp->filhoEsquerda != nullptr) {
-                inserir_rec(chave,tmp->filhoEsquerda);
-            } else {
+    void inserir_rec(T chave, Nodo<T> *tmp)
+    {
+        int altura = 0;
+        if (chave < tmp->chave)
+        {
+            if (tmp->filhoEsquerda != nullptr)
+            {
+                inserir_rec(chave, tmp->filhoEsquerda);
+                altura = tmp->filhoEsquerda->altura;
+            }
+            else
+            {
                 tmp->filhoEsquerda = new Nodo<T>;
                 tmp->filhoEsquerda->chave = chave;
             }
-        } else {
-            if (tmp->filhoDireita != nullptr) {
-                inserir_rec(chave,tmp->filhoDireita);
-            } else {
+        }
+        else
+        {
+            if (tmp->filhoDireita != nullptr)
+            {
+                inserir_rec(chave, tmp->filhoDireita);
+                altura = tmp->filhoDireita->altura > altura ? tmp->filhoDireita->altura : altura;
+            }
+            else
+            {
                 tmp->filhoDireita = new Nodo<T>;
                 tmp->filhoDireita->chave = chave;
             }
         }
-        tmp->altura = tmp->altura / 2;
-        tmp->altura++;
+        altura++;
+        // tmp->altura = tmp->altura / 2;
+        tmp->altura = altura;
     }
 
-    void remover_rec(Nodo<T> * root,T chave){
-        if (root != nullptr) {
-            if (chave > root->chave) {
+    void remover_rec(Nodo<T> *root, T chave)
+    {
+        if (root != nullptr)
+        {
+            if (chave > root->chave)
+            {
                 remover_rec(root->filhoDireita, chave);
-                if (root->filhoDireita != nullptr){
-                    if (root->filhoDireita->altura == -1){
-                        Nodo<T> * tmp = root->filhoDireita;
+                if (root->filhoDireita != nullptr)
+                {
+                    if (root->filhoDireita->altura == -1)
+                    {
+                        Nodo<T> *tmp = root->filhoDireita;
                         root->filhoDireita = nullptr;
                         delete tmp;
                     }
                 }
-                if (root->filhoEsquerda != nullptr){
-                    if (root->filhoEsquerda->altura == -1){
-                        Nodo<T> * tmp = root->filhoEsquerda;
+                if (root->filhoEsquerda != nullptr)
+                {
+                    if (root->filhoEsquerda->altura == -1)
+                    {
+                        Nodo<T> *tmp = root->filhoEsquerda;
                         root->filhoEsquerda = nullptr;
                         delete tmp;
                     }
                 }
-            } else if (chave < root->chave) {
+            }
+            else if (chave < root->chave)
+            {
                 remover_rec(root->filhoEsquerda, chave);
-                if (root->filhoDireita != nullptr){
-                    if (root->filhoDireita->altura == -1){
-                        Nodo<T> * tmp = root->filhoDireita;
+                if (root->filhoDireita != nullptr)
+                {
+                    if (root->filhoDireita->altura == -1)
+                    {
+                        Nodo<T> *tmp = root->filhoDireita;
                         root->filhoDireita = nullptr;
                         delete tmp;
                     }
                 }
-                if (root->filhoEsquerda != nullptr){
-                    if (root->filhoEsquerda->altura == -1){
-                        Nodo<T> * tmp = root->filhoEsquerda;
+                if (root->filhoEsquerda != nullptr)
+                {
+                    if (root->filhoEsquerda->altura == -1)
+                    {
+                        Nodo<T> *tmp = root->filhoEsquerda;
                         root->filhoEsquerda = nullptr;
                         delete tmp;
                     }
                 }
-            } else {
-                if (root->filhoDireita == nullptr && root->filhoEsquerda == nullptr){
+            }
+            else
+            {
+                if (root->filhoDireita == nullptr && root->filhoEsquerda == nullptr)
+                {
                     root->altura = -1;
-                } else if (root->filhoDireita && root->filhoEsquerda){
-                    Nodo<T> * predecessor = get_max(root->filhoDireita);
+                }
+                else if (root->filhoDireita && root->filhoEsquerda)
+                {
+                    Nodo<T> *predecessor = get_max(root->filhoDireita);
 
                     root->chave = predecessor->chave;
                     remover_rec(root->filhoDireita, predecessor->chave);
                     root->altura--;
-                } else {
-                    Nodo<T> * child = (root->filhoDireita)? root->filhoDireita: root->filhoEsquerda;
-                    Nodo<T> * curr = root;
-
-                    root = child;
-                    delete curr;
+                }
+                else
+                {
+                    if(root->filhoDireita){
+                        Nodo<T> *child = root->filhoDireita;
+                        root->chave = child->chave;
+                        root->filhoDireita = nullptr;
+                        delete child;
+                    } else {
+                        Nodo<T> *child = root->filhoEsquerda;
+                        root->chave = child->chave;
+                        root->filhoEsquerda = nullptr;
+                        delete child;
+                    }
                 }
             }
         }
     }
 
-    void get_rec(T chave,Nodo<T>* tmp)const{
-        if(tmp != nullptr){
-            if(chave == tmp->chave) {
-                return;
-            } else if (chave > tmp->chave) {
-                tmp = tmp->filhoDireita;
-            } else if(chave < tmp->chave) {
-                tmp = tmp->filhoEsquerda;
-            }
-            get_rec(chave,tmp);
+    std::optional<Nodo<T> *> get_rec(Nodo<T> *tmp, T chave) const
+    {
+        if (tmp == nullptr)
+        {
+            return std::nullopt;
         }
+
+        if (tmp->chave == chave)
+        {
+            return tmp;
+        }
+
+        if (tmp->chave > chave)
+        {
+            return get_rec(tmp->filhoEsquerda, chave);
+        }
+
+        if (tmp->chave < chave)
+        {
+            return get_rec(tmp->filhoDireita, chave);
+        }
+
+        return std::nullopt;
     }
 
-    Nodo<T>* get_max(Nodo<T>* tmp) {
-        while (tmp->filhoEsquerda != nullptr) {
+    Nodo<T> *get_max(Nodo<T> *tmp)
+    {
+        while (tmp->filhoEsquerda != nullptr)
+        {
             tmp = tmp->filhoEsquerda;
         }
         return tmp;
     }
+
 public:
-    //MinhaArvoreDeBuscaBinaria();
+    // MinhaArvoreDeBuscaBinaria();
     ~MinhaArvoreDeBuscaBinaria(){
 
     };
@@ -207,7 +288,8 @@ public:
      * @brief Verifica se a arvore esta vazia
      * @return Verdade se a arvore esta vazia.
      */
-    bool vazia() const {
+    bool vazia() const
+    {
         return this->_raiz == nullptr ? true : false;
     };
 
@@ -215,11 +297,9 @@ public:
      * @brief Retornar quantidade de chaves na arvore
      * @return Numero natural que representa a quantidade de chaves na arvore
      */
-    int quantidade() const {
-        int *q;
-        *q = 0;
-        quantidade_andar(q,this->_raiz);
-        return *q;
+    int quantidade() const
+    {
+        return quantidade_andar(this->_raiz);
     };
 
     /**
@@ -227,10 +307,11 @@ public:
      * @param chave chave a ser procurada na arvore
      * @return Verdade se a arvore contem a chave
      */
-    bool contem(T chave) const{
+    bool contem(T chave) const
+    {
         bool result = false;
 
-        result = contem_rec(chave,this->_raiz);
+        result = contem_rec(chave, this->_raiz);
 
         return result;
     };
@@ -240,11 +321,13 @@ public:
      * @param chave chave que é raiz da (sub)arvore cuja altura queremos. Se chave é nula, retorna a altura da arvore.
      * @return Numero inteiro representando a altura da (subarvore). Se chave nao esta na arvore, retorna std::nullopt
      */
-    std::optional<int> altura(T chave)const {
-        Nodo<T>* nodo = this->_raiz;
-        get_rec(chave,nodo);
+    std::optional<int> altura(T chave) const
+    {
+
+        Nodo<T> *nodo = get_rec(this->_raiz, chave).value_or(nullptr);
         std::optional<int> q;
-        if(nodo != nullptr){
+        if (nodo != nullptr)
+        {
             q = nodo->altura;
         }
         return q;
@@ -254,20 +337,25 @@ public:
      * @brief Insere uma chave na arvore
      * @param chave chave a ser inserida
      */
-    void inserir(T chave){
-        if (this->_raiz != nullptr) {
-            inserir_rec(chave,this->_raiz);
-        } else {
+    void inserir(T chave)
+    {
+        if (this->_raiz != nullptr)
+        {
+            inserir_rec(chave, this->_raiz);
+        }
+        else
+        {
             this->_raiz = new Nodo<T>;
             this->_raiz->chave = chave;
         }
-        if(this->_raiz->filhoEsquerda != nullptr){
+        if (this->_raiz->filhoEsquerda != nullptr)
+        {
             this->_raiz->altura = this->_raiz->filhoEsquerda->altura + 1;
         }
-        if(this->_raiz->filhoDireita != nullptr){
+        if (this->_raiz->filhoDireita != nullptr)
+        {
             this->_raiz->altura = this->_raiz->altura - 1 + this->_raiz->filhoDireita->altura;
         }
-
     };
 
     /**
@@ -275,8 +363,9 @@ public:
      * @param chave chave a removida
      * @return Retorna a chave removida ou nullptr se a chave nao esta na arvore
      */
-    void remover(T chave){
-        remover_rec(this->_raiz,chave);
+    void remover(T chave)
+    {
+        remover_rec(this->_raiz, chave);
     };
 
     /**
@@ -284,16 +373,20 @@ public:
      * @param chave chave da arvore que eh pai do filho a esquerda
      * @return Chave do filho a esquerda. Se chave nao esta na arvore, retorna std::nullopt
      */
-    std::optional<T> filhoEsquerdaDe(T chave) const{
+    std::optional<T> filhoEsquerdaDe(T chave) const
+    {
         std::optional<T> filho;
-        if(this->_raiz != nullptr){
-            if(this->_raiz->chave != chave){
-                filho = filhoEsquerdaDe_rec(chave,this->_raiz);
-            } else {
+        if (this->_raiz != nullptr)
+        {
+            if (this->_raiz->chave != chave)
+            {
+                filho = filhoEsquerdaDe_rec(chave, this->_raiz);
+            }
+            else
+            {
                 filho = this->_raiz->filhoEsquerda->chave;
             }
         }
-
 
         return filho;
     };
@@ -303,13 +396,19 @@ public:
      * @param chave chave da arvore que eh pai do filho a direita
      * @return Chave do filho a direita. Se chave nao esta na arvore, retorna nullptr
      */
-    std::optional<T> filhoDireitaDe(T chave) const{
+    std::optional<T> filhoDireitaDe(T chave) const
+    {
         std::optional<T> filho;
-        if(this->_raiz != nullptr){
-            if(this->_raiz->chave != chave){
-                filho = filhoDireitaDe_rec(chave,this->_raiz);
-            } else {
-                if(this->_raiz->filhoDireita != nullptr){
+        if (this->_raiz != nullptr)
+        {
+            if (this->_raiz->chave != chave)
+            {
+                filho = filhoDireitaDe_rec(chave, this->_raiz);
+            }
+            else
+            {
+                if (this->_raiz->filhoDireita != nullptr)
+                {
                     filho = this->_raiz->filhoDireita->chave;
                 }
             }
@@ -321,10 +420,12 @@ public:
      * @brief Lista chaves visitando a arvore em ordem
      * @return Lista encadeada contendo as chaves em ordem.
      */
-    ListaEncadeadaAbstrata<T>* emOrdem() const{
-        MinhaListaEncadeada<T>* result = new MinhaListaEncadeada<T>();
-        if(this->_raiz != nullptr){
-            emOrdem_rec(result,this->_raiz);
+    ListaEncadeadaAbstrata<T> *emOrdem() const
+    {
+        MinhaListaEncadeada<T> *result = new MinhaListaEncadeada<T>();
+        if (this->_raiz != nullptr)
+        {
+            emOrdem_rec(result, this->_raiz);
         }
         return result;
     };
@@ -333,10 +434,12 @@ public:
      * @brief Lista chaves visitando a arvore em pre-ordem
      * @return Lista encadeada contendo as chaves em pre-ordem.
      */
-    ListaEncadeadaAbstrata<T>* preOrdem() const{
-        MinhaListaEncadeada<T>* result = new MinhaListaEncadeada<T>();
-        if(this->_raiz != nullptr){
-            preOrdem_rec(result,this->_raiz);
+    ListaEncadeadaAbstrata<T> *preOrdem() const
+    {
+        MinhaListaEncadeada<T> *result = new MinhaListaEncadeada<T>();
+        if (this->_raiz != nullptr)
+        {
+            preOrdem_rec(result, this->_raiz);
         }
         return result;
     };
@@ -345,10 +448,12 @@ public:
      * @brief Lista chaves visitando a arvore em pos-ordem
      * @return Lista encadeada contendo as chaves em pos ordem.
      */
-    ListaEncadeadaAbstrata<T>* posOrdem() const{
-        MinhaListaEncadeada<T>* result = new MinhaListaEncadeada<T>();
-        if(this->_raiz != nullptr){
-            posOrdem_rec(result,this->_raiz);
+    ListaEncadeadaAbstrata<T> *posOrdem() const
+    {
+        MinhaListaEncadeada<T> *result = new MinhaListaEncadeada<T>();
+        if (this->_raiz != nullptr)
+        {
+            posOrdem_rec(result, this->_raiz);
         }
         return result;
     };
